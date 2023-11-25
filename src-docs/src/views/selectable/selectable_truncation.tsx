@@ -122,7 +122,10 @@ export default () => {
           )}
       </EuiFlexGroup>
       <EuiSpacer />
-      <EuiPanel paddingSize="s" style={{ inlineSize: 400 }}>
+      <EuiPanel
+        paddingSize="s"
+        style={{ inlineSize: 400, resize: 'horizontal', overflow: 'auto' }}
+      >
         <EuiSelectable
           searchable={true}
           options={options}
