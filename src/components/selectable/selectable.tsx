@@ -214,17 +214,27 @@ export class EuiSelectable<T = {}> extends Component<
     this.listId = this.rootId('listbox');
     this.messageContentId = this.rootId('messageContent');
 
-    const { options, singleSelection, isPreFiltered, searchProps } = props;
-
-    const initialSearchValue =
-      searchProps?.value || String(searchProps?.defaultValue || '');
-
-    const visibleOptions = getMatchingOptions<T>(
+    const {
       options,
-      initialSearchValue,
-      isPreFiltered
-    );
-    searchProps?.onChange?.(initialSearchValue, visibleOptions);
+      singleSelection,
+      isPreFiltered,
+      searchProps: {
+        onChange,
+        value,
+        defaultValue,
+        isCaseSensitive,
+        hideSelectedOptionsOnSearch,
+      } = {},
+    } = props;
+
+    const initialSearchValue = value || String(defaultValue || '');
+
+    const visibleOptions = getMatchingOptions<T>(options, initialSearchValue, {
+      isPreFiltered,
+      isCaseSensitive,
+      hideSelectedOptionsOnSearch,
+    });
+    onChange?.(initialSearchValue, visibleOptions);
 
     // ensure that the currently selected single option is active if it is in the visibleOptions
     const selectedOptions = options.filter((option) => option.checked);
@@ -247,7 +257,11 @@ export class EuiSelectable<T = {}> extends Component<
     nextProps: EuiSelectableProps<T>,
     prevState: EuiSelectableState<T>
   ) {
-    const { options, isPreFiltered, searchProps } = nextProps;
+    const {
+      options,
+      isPreFiltered,
+      searchProps: { value, isCaseSensitive, hideSelectedOptionsOnSearch } = {},
+    } = nextProps;
     const { activeOptionIndex, searchValue } = prevState;
 
     const stateUpdate: Partial<EuiSelectableState<T>> = {
@@ -255,14 +269,14 @@ export class EuiSelectable<T = {}> extends Component<
       activeOptionIndex,
     };
 
-    if (searchProps?.value != null && searchProps.value !== searchValue) {
-      stateUpdate.searchValue = searchProps.value;
+    if (value != null && value !== searchValue) {
+      stateUpdate.searchValue = value;
     }
 
     stateUpdate.visibleOptions = getMatchingOptions<T>(
       options,
       stateUpdate.searchValue ?? '',
-      isPreFiltered
+      { isPreFiltered, isCaseSensitive, hideSelectedOptionsOnSearch }
     );
 
     if (
@@ -477,13 +491,17 @@ export class EuiSelectable<T = {}> extends Component<
     event: EuiSelectableOnChangeEvent,
     clickedOption: EuiSelectableOption<T>
   ) => {
-    const { isPreFiltered, onChange } = this.props;
+    const {
+      isPreFiltered,
+      onChange,
+      searchProps: { isCaseSensitive } = {},
+    } = this.props;
     const { searchValue } = this.state;
-    const visibleOptions = getMatchingOptions(
-      options,
-      searchValue,
-      isPreFiltered
-    );
+
+    const visibleOptions = getMatchingOptions(options, searchValue, {
+      isPreFiltered,
+      isCaseSensitive,
+    });
 
     this.setState({ visibleOptions });
 
@@ -604,17 +622,31 @@ export class EuiSelectable<T = {}> extends Component<
         noMatchesMessage === undefined ||
         typeof noMatchesMessage === 'string'
       ) {
-        messageContent = (
-          <p>
-            {noMatchesMessage || (
-              <EuiI18n
-                token="euiSelectable.noMatchingOptions"
-                default="{searchValue} doesn't match any options"
-                values={{ searchValue: <strong>{searchValue}</strong> }}
-              />
-            )}
-          </p>
-        );
+        if (searchProps?.hideSelectedOptionsOnSearch) {
+          messageContent = (
+            <p>
+              {noMatchesMessage || (
+                <EuiI18n
+                  token="euiSelectable.noMatchingUnselectedOptions"
+                  default="{searchValue} doesn't match any unselected options"
+                  values={{ searchValue: <strong>{searchValue}</strong> }}
+                />
+              )}
+            </p>
+          );
+        } else {
+          messageContent = (
+            <p>
+              {noMatchesMessage || (
+                <EuiI18n
+                  token="euiSelectable.noMatchingOptions"
+                  default="{searchValue} doesn't match any options"
+                  values={{ searchValue: <strong>{searchValue}</strong> }}
+                />
+              )}
+            </p>
+          );
+        }
       } else {
         messageContent = React.cloneElement(noMatchesMessage, {
           id: this.messageContentId,
@@ -780,6 +812,7 @@ export class EuiSelectable<T = {}> extends Component<
                 key="list"
                 options={options}
                 visibleOptions={visibleOptions}
+                isSearchCaseSensitive={this.props.searchProps?.isCaseSensitive}
                 searchValue={searchValue}
                 activeOptionIndex={activeOptionIndex}
                 setActiveOptionIndex={(index, cb) => {

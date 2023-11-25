@@ -26,7 +26,7 @@ const options: EuiSelectableOption[] = [
   },
   {
     label:
-      "Pandora is one of Saturn's moons, named for a Titaness of Greek mythology",
+      "Pandora is one of Saturn's moons, named for a titaness of Greek mythology",
   },
 ];
 
@@ -273,6 +273,38 @@ describe('EuiSelectable', () => {
       );
 
       expect(getByTestSubject('searchInput')).toHaveValue('');
+    });
+  });
+
+  describe('search case sensitivity', () => {
+    it('defaults to case-insensitive search', () => {
+      const { queryAllByRole, container } = render(
+        <EuiSelectable
+          options={options}
+          searchable
+          searchProps={{ value: 'titan' }}
+        >
+          {(list) => list}
+        </EuiSelectable>
+      );
+
+      expect(queryAllByRole('option')).toHaveLength(2);
+      expect(container.querySelector('.euiMark')).toHaveTextContent('Titan');
+    });
+
+    it('allows configuring case sensitive search via `searchProps.isCaseSensitive`', () => {
+      const { queryAllByRole, container } = render(
+        <EuiSelectable
+          options={options}
+          searchable
+          searchProps={{ value: 'titan', isCaseSensitive: true }}
+        >
+          {(list) => list}
+        </EuiSelectable>
+      );
+
+      expect(queryAllByRole('option')).toHaveLength(1);
+      expect(container.querySelector('.euiMark')).toHaveTextContent('titan');
     });
   });
 

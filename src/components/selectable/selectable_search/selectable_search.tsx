@@ -27,6 +27,16 @@ export type EuiSelectableSearchProps<T> = CommonProps &
       searchValue: string,
       matchingOptions: Array<EuiSelectableOption<T>>
     ) => void;
+    /**
+     * Whether to match options with case sensitivity.
+     * @default false
+     */
+    isCaseSensitive?: boolean;
+    /**
+     * Allows excluding already-selected options from showing up in the search list
+     * @default false
+     */
+    hideSelectedOptionsOnSearch?: boolean;
   };
 
 type _EuiSelectableSearchProps<T> = EuiSelectableSearchProps<T> & {
@@ -48,6 +58,8 @@ export const EuiSelectableSearch = <T,>({
   value,
   placeholder,
   isPreFiltered,
+  isCaseSensitive,
+  hideSelectedOptionsOnSearch,
   listId,
   className,
   ...rest
@@ -55,14 +67,20 @@ export const EuiSelectableSearch = <T,>({
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const searchValue = e.target.value;
-      const matchingOptions = getMatchingOptions<T>(
-        options,
-        searchValue,
-        isPreFiltered
-      );
+      const matchingOptions = getMatchingOptions<T>(options, searchValue, {
+        isPreFiltered,
+        isCaseSensitive,
+        hideSelectedOptionsOnSearch,
+      });
       onChangeCallback(searchValue, matchingOptions);
     },
-    [options, isPreFiltered, onChangeCallback]
+    [
+      options,
+      isPreFiltered,
+      onChangeCallback,
+      isCaseSensitive,
+      hideSelectedOptionsOnSearch,
+    ]
   );
 
   const classes = classNames('euiSelectableSearch', className);

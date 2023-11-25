@@ -216,7 +216,7 @@ exports[`EuiSelectable errorMessage prop does not render the message when not de
             id="generated-id_listbox_option-2"
             role="option"
             style="position: absolute; left: 0px; top: 64px; height: 32px; width: 100%;"
-            title="Pandora is one of Saturn's moons, named for a Titaness of Greek mythology"
+            title="Pandora is one of Saturn's moons, named for a titaness of Greek mythology"
           >
             <span
               class="euiSelectableListItem__content"
@@ -228,7 +228,7 @@ exports[`EuiSelectable errorMessage prop does not render the message when not de
               <span
                 class="euiSelectableListItem__text euiSelectableListItem__text--truncate"
               >
-                Pandora is one of Saturn's moons, named for a Titaness of Greek mythology
+                Pandora is one of Saturn's moons, named for a titaness of Greek mythology
               </span>
             </span>
           </li>
@@ -421,7 +421,7 @@ Object {
       "label": "Enceladus",
     },
     Object {
-      "label": "Pandora is one of Saturn's moons, named for a Titaness of Greek mythology",
+      "label": "Pandora is one of Saturn's moons, named for a titaness of Greek mythology",
     },
   ],
 }
@@ -441,7 +441,7 @@ Object {
       "label": "Enceladus",
     },
     Object {
-      "label": "Pandora is one of Saturn's moons, named for a Titaness of Greek mythology",
+      "label": "Pandora is one of Saturn's moons, named for a titaness of Greek mythology",
     },
   ],
 }

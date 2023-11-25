@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 
-import { EuiSelectable, EuiSelectableOption } from '../../../../src';
+import {
+  EuiSelectable,
+  EuiSelectableOption,
+  EuiFlexGroup,
+  EuiSwitch,
+  EuiSpacer,
+} from '../../../../src';
 
 export default () => {
+  const [isCaseSensitive, setIsCaseSensitive] = useState(false);
+  const [hideSelectedOptionsOnSearch, setHideSelectedOptionsOnSearch] =
+    useState(false);
+
   const [options, setOptions] = useState<EuiSelectableOption[]>([
     {
       label: 'Titan',
@@ -42,21 +52,40 @@ export default () => {
   ]);
 
   return (
-    <EuiSelectable
-      aria-label="Searchable example"
-      searchable
-      searchProps={{
-        'data-test-subj': 'selectableSearchHere',
-      }}
-      options={options}
-      onChange={(newOptions) => setOptions(newOptions)}
-    >
-      {(list, search) => (
-        <>
-          {search}
-          {list}
-        </>
-      )}
-    </EuiSelectable>
+    <>
+      <EuiFlexGroup responsive={false} wrap>
+        <EuiSwitch
+          label="Case sensitive"
+          checked={isCaseSensitive}
+          onChange={() => setIsCaseSensitive(!isCaseSensitive)}
+        />
+        <EuiSwitch
+          label="Exclude selected options while searching"
+          checked={hideSelectedOptionsOnSearch}
+          onChange={() =>
+            setHideSelectedOptionsOnSearch(!hideSelectedOptionsOnSearch)
+          }
+        />
+      </EuiFlexGroup>
+      <EuiSpacer />
+      <EuiSelectable
+        aria-label="Searchable example"
+        searchable
+        searchProps={{
+          isCaseSensitive,
+          hideSelectedOptionsOnSearch,
+          'data-test-subj': 'selectableSearchHere',
+        }}
+        options={options}
+        onChange={(newOptions) => setOptions(newOptions)}
+      >
+        {(list, search) => (
+          <>
+            {search}
+            {list}
+          </>
+        )}
+      </EuiSelectable>
+    </>
   );
 };

@@ -153,6 +153,7 @@ export type EuiSelectableListProps<T> = EuiSelectableOptionsListProps & {
    */
   allowExclusions?: boolean;
   searchable?: boolean;
+  isSearchCaseSensitive?: boolean;
   makeOptionId: (index: number | undefined) => string;
   listId: string;
   setActiveOptionIndex: (index: number, cb?: () => void) => void;
@@ -521,16 +522,20 @@ export class EuiSelectableList<T> extends Component<
     text: string,
     truncationProps?: EuiSelectableOptionsListProps['truncationProps']
   ) => {
-    const { searchValue } = this.props;
+    const { searchValue, isSearchCaseSensitive } = this.props;
 
     // If truncationProps is undefined, we're using non-virtualized text wrapping
     if (!truncationProps) {
-      return <EuiHighlight search={searchValue}>{text}</EuiHighlight>;
+      return (
+        <EuiHighlight search={searchValue} strict={isSearchCaseSensitive}>
+          {text}
+        </EuiHighlight>
+      );
     }
 
-    const searchPositionStart = text
-      .toLowerCase()
-      .indexOf(searchValue.toLowerCase());
+    const searchPositionStart = isSearchCaseSensitive
+      ? text.indexOf(searchValue)
+      : text.toLowerCase().indexOf(searchValue.toLowerCase());
     const searchPositionCenter =
       searchPositionStart + Math.floor(searchValue.length / 2);
 
@@ -545,7 +550,9 @@ export class EuiSelectableList<T> extends Component<
         {(text) => (
           <>
             {text.length >= searchValue.length ? (
-              <EuiHighlight search={searchValue}>{text}</EuiHighlight>
+              <EuiHighlight search={searchValue} strict={isSearchCaseSensitive}>
+                {text}
+              </EuiHighlight>
             ) : (
               // If the available truncated text is shorter than the full search string,
               // just highlight the entire truncated text
@@ -575,7 +582,6 @@ export class EuiSelectableList<T> extends Component<
     const {
       className,
       options,
-      searchValue,
       onOptionClick,
       renderOption,
       height: forcedHeight,
@@ -589,7 +595,6 @@ export class EuiSelectableList<T> extends Component<
       allowExclusions,
       bordered,
       paddingSize,
-      searchable,
       onFocusBadge,
       listId,
       setActiveOptionIndex,
@@ -597,6 +602,9 @@ export class EuiSelectableList<T> extends Component<
       'aria-labelledby': ariaLabelledby,
       'aria-describedby': ariaDescribedby,
       role,
+      searchable,
+      searchValue,
+      isSearchCaseSensitive,
       isVirtualized,
       textWrap,
       truncationProps,
