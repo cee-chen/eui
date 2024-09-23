@@ -29,7 +29,7 @@ export const euiFormMaxWidth = ({ euiTheme }: UseEuiTheme) =>
   mathWithUnits(euiTheme.size.base, (x) => x * 25);
 
 export const euiFormVariables = (euiThemeContext: UseEuiTheme) => {
-  const { euiTheme, colorMode } = euiThemeContext;
+  const { euiTheme, colorMode, highContrastMode } = euiThemeContext;
   const isColorDark = colorMode === 'DARK';
   const backgroundColor = isColorDark
     ? shade(euiTheme.colors.lightestShade, 0.4)
@@ -55,12 +55,14 @@ export const euiFormVariables = (euiThemeContext: UseEuiTheme) => {
     backgroundColor: backgroundColor,
     backgroundDisabledColor: darken(euiTheme.colors.lightestShade, 0.05),
     backgroundReadOnlyColor: euiTheme.colors.emptyShade,
-    borderColor: transparentize(
-      colorMode === 'DARK'
-        ? euiTheme.colors.ghost
-        : darken(euiTheme.border.color, 4),
-      0.1
-    ),
+    borderColor: highContrastMode
+      ? euiTheme.border.color
+      : transparentize(
+          colorMode === 'DARK'
+            ? euiTheme.colors.ghost
+            : darken(euiTheme.border.color, 4),
+          0.1
+        ),
     controlDisabledColor: euiTheme.colors.mediumShade,
     controlBoxShadow: '0 0 transparent',
     controlPlaceholderText: makeHighContrastColor(euiTheme.colors.subduedText)(
