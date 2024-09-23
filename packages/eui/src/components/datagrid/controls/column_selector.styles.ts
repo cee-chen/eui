@@ -30,7 +30,9 @@ export const euiDataGridColumnSelectorStyles = (
       padding: ${euiTheme.size.xs};
 
       &.euiDataGridColumnSelector__item-isDragging {
-        ${euiShadowLarge(euiThemeContext)}
+        ${euiShadowLarge(euiThemeContext, {
+          borderAllInHighContrastMode: true,
+        })}
         background-color: ${euiTheme.colors.emptyShade};
       }
     `,
