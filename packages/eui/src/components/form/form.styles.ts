@@ -195,7 +195,7 @@ export const euiFormControlDefaultShadow = (
     withBackgroundAnimation?: boolean;
   } = {}
 ) => {
-  const { euiTheme } = euiThemeContext;
+  const { euiTheme, highContrastMode } = euiThemeContext;
   const form = euiFormVariables(euiThemeContext);
 
   // We use inset box-shadow instead of border to skip extra height calculations
@@ -208,13 +208,16 @@ export const euiFormControlDefaultShadow = (
     background-color: ${form.backgroundColor};
   `.trim();
 
+  const gradientThickness = highContrastMode
+    ? mathWithUnits(euiTheme.border.width.thick, (x) => x * 2)
+    : euiTheme.border.width.thick;
   const backgroundGradient = `
     background-repeat: no-repeat;
     background-size: 0% 100%;
     background-image: linear-gradient(to top,
       var(--euiFormControlStateColor),
-      var(--euiFormControlStateColor) ${euiTheme.border.width.thick},
-      transparent ${euiTheme.border.width.thick},
+      var(--euiFormControlStateColor) ${gradientThickness},
+      transparent ${gradientThickness},
       transparent 100%
     );
   `.trim();
