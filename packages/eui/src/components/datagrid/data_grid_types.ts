@@ -1101,7 +1101,10 @@ export type EuiDataGridScrollAnchorRow = 'start' | 'center' | undefined;
 export type EuiDataGridRowHeightOption =
   | number
   | 'auto'
-  | ExclusiveUnion<{ lineCount: number }, { height: number }>;
+  | ExclusiveUnion<
+      { lineCount: number; autoBelowLineCount?: boolean },
+      { height: number }
+    >;
 
 export interface EuiDataGridRowHeightsOptions {
   /**

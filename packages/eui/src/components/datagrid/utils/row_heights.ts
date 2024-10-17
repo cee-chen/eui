@@ -65,8 +65,10 @@ export class RowHeightUtils {
     }
 
     if (isObject(heightOption) && heightOption.lineCount) {
-      if (isRowHeightOverride) {
-        return this.getRowHeight(rowIndex!) || defaultHeight; // lineCount overrides are stored in the heights cache
+      // lineCount overrides are stored in the heights cache
+      // `autoBelowLineCount` uses auto heights / heights cache
+      if (isRowHeightOverride || this.isAutoBelowLineCount(heightOption)) {
+        return this.getRowHeight(rowIndex!) || defaultHeight;
       } else {
         return defaultHeight; // default lineCount height is set in minRowHeight state in grid_row_body
       }
@@ -92,7 +94,11 @@ export class RowHeightUtils {
     }
     const lineCount = this.getLineCount(option);
     if (lineCount != null) {
-      return lineCount > 1 ? 'lineCount' : 'default';
+      return this.isAutoBelowLineCount(option)
+        ? 'autoBelowLineCount'
+        : lineCount > 1
+        ? 'lineCount'
+        : 'default';
     }
     return 'numerical';
   };
@@ -103,6 +109,12 @@ export class RowHeightUtils {
 
   getLineCount(option?: EuiDataGridRowHeightOption) {
     return isObject(option) ? option.lineCount : undefined;
+  }
+
+  isAutoBelowLineCount(option?: EuiDataGridRowHeightOption) {
+    return (
+      isObject(option) && option.autoBelowLineCount && option.lineCount > 1
+    );
   }
 
   calculateHeightForLineCount(cellRef: HTMLElement, lineCount: number) {
@@ -126,6 +138,9 @@ export class RowHeightUtils {
     const height = this.getRowHeightOption(rowIndex, rowHeightsOptions);
 
     if (height === AUTO_HEIGHT) {
+      return true;
+    }
+    if (this.isAutoBelowLineCount(height)) {
       return true;
     }
     return false;

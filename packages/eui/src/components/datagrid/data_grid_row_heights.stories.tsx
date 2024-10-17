@@ -80,6 +80,26 @@ export const LineCount1: Story = {
   ),
 };
 
+import { faker } from '@faker-js/faker';
+faker.seed(42);
+const loremData = Array.from({ length: 5 }).map((_, i) =>
+  faker.lorem.lines(i % 2 === 0 ? 1 : { min: 2, max: 10 })
+);
+
+export const AutoBelowLineCount: Story = {
+  args: {
+    defaultHeight: { lineCount: 3, autoBelowLineCount: true },
+  },
+  render: (rowHeightsOptions) => (
+    <StatefulDataGrid
+      {...storyArgs}
+      rowHeightsOptions={rowHeightsOptions}
+      renderCellValue={({ rowIndex }) => loremData[rowIndex]}
+      columns={[{ id: 'name' }, { id: 'location' }]}
+    />
+  ),
+};
+
 export const StaticHeight: Story = {
   args: {
     defaultHeight: { height: 48 },

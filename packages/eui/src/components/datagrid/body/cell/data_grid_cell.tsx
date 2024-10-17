@@ -104,7 +104,7 @@ const EuiDataGridCellContent: FunctionComponent<
         : [
             // Regular data cells should always inherit height from the row wrapper,
             // except for auto height
-            cellHeightType === 'auto'
+            cellHeightType === 'auto' || cellHeightType === 'autoBelowLineCount'
               ? styles.content.autoHeight
               : styles.content.defaultHeight,
           ]),
@@ -113,7 +113,9 @@ const EuiDataGridCellContent: FunctionComponent<
     return (
       <RenderTruncatedCellContent
         hasLineCountTruncation={
-          cellHeightType === 'lineCount' && !isControlColumn
+          (cellHeightType === 'lineCount' ||
+            cellHeightType === 'autoBelowLineCount') &&
+          !isControlColumn
         }
         rowHeight={rowHeight}
       >
@@ -201,6 +203,8 @@ export class EuiDataGridCell extends Component<
       rowIndex,
       rowHeightsOptions
     );
+    if (rowHeightUtils?.isAutoBelowLineCount(rowHeightOption)) return; // Using auto height instead
+
     const isSingleLine = rowHeightOption == null; // Undefined rowHeightsOptions default to a single line
     const lineCount = isSingleLine
       ? 1

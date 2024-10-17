@@ -161,6 +161,12 @@ const RowHeightControl = ({
   rowHeightsOptions: EuiDataGridRowHeightsOptions;
   onChange: Function;
 }) => {
+  // TODO: doesn't allow consumers to start out with auto and switch to autoBelowLineCount
+  const { current: autoBelowLineCount } = useRef(
+    typeof rowHeightsOptions.defaultHeight === 'object' &&
+      rowHeightsOptions.defaultHeight.autoBelowLineCount
+  );
+
   const [lineCountInput, setLineCountInput] = useState(1);
   const setLineCountHeight = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -169,11 +175,14 @@ const RowHeightControl = ({
 
       onChange({
         rowHeights: {}, // Unset all row-specific line counts
-        defaultHeight:
-          newLineCount > 1 ? { lineCount: newLineCount } : undefined, // lineCount: 1 is the same as undefined, and this helps correctly display the reset button
+        defaultHeight: autoBelowLineCount
+          ? { lineCount: newLineCount, autoBelowLineCount }
+          : newLineCount > 1
+          ? { lineCount: newLineCount }
+          : undefined, // lineCount: 1 is the same as undefined, and this helps correctly display the reset button
       });
     },
-    [onChange]
+    [onChange, autoBelowLineCount]
   );
 
   useEffect(() => {
@@ -208,7 +217,7 @@ const RowHeightControl = ({
         const lineCount = Number(lineCountInput);
 
         if (lineCount > 1) {
-          rowHeightsOptions.defaultHeight = { lineCount };
+          rowHeightsOptions.defaultHeight = { lineCount, autoBelowLineCount };
         } else {
           // lineCount: 1 is the same as single/undefined
           rowHeightsOptions.defaultHeight = undefined;
@@ -217,7 +226,7 @@ const RowHeightControl = ({
 
       onChange(rowHeightsOptions);
     },
-    [lineCountInput, onChange]
+    [lineCountInput, autoBelowLineCount, onChange]
   );
 
   return (
@@ -226,10 +235,11 @@ const RowHeightControl = ({
         'euiDisplaySelector.rowHeightLabel',
         'euiDisplaySelector.labelAuto',
         'euiDisplaySelector.labelStatic',
+        'euiDisplaySelector.labelMax',
       ]}
-      defaults={['Lines per row', 'Auto', 'Static']}
+      defaults={['Lines per row', 'Auto', 'Static', 'Max']}
     >
-      {([rowHeightLabel, labelAuto, labelStatic]: string[]) => (
+      {([rowHeightLabel, labelAuto, labelStatic, labelMax]: string[]) => (
         <EuiFormRow label={rowHeightLabel} display="columnCompressed">
           <EuiFlexGroup gutterSize="s" responsive={false}>
             <EuiButtonGroup
@@ -239,7 +249,10 @@ const RowHeightControl = ({
               isFullWidth
               options={[
                 { id: 'auto', label: labelAuto },
-                { id: 'static', label: labelStatic },
+                {
+                  id: 'static',
+                  label: autoBelowLineCount ? labelMax : labelStatic,
+                },
               ]}
               onChange={setRowHeight}
               idSelected={rowHeightSelection}
